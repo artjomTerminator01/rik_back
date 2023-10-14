@@ -24,6 +24,7 @@ def create_company(db: Session, name: str, reg_code: str, created_at: str):
     db.add(new_company)
     db.commit()
     db.refresh(new_company)
+    
     return new_company
 
 def get_company_members(db, company_id):
