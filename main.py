@@ -32,9 +32,9 @@ class PersonCreate(BaseModel):
     name: str
     personalCode: str
 
-@app.get("/company/{company_id}")
-def get_company(company_id: int):
-    return get_company_data(SessionLocal(), company_id)
+@app.get("/company/{reg_code}")
+def get_company(reg_code: str):
+    return get_company_data(SessionLocal(), reg_code)
 
 @app.get("/companies")
 def get_companies():
@@ -48,7 +48,7 @@ def post_company(company_data: CompanyCreate):
     capital = company_data.capital
     members = company_data.members
     
-    return create_company(SessionLocal(), name, reg_code, created_at)
+    return create_company(SessionLocal(), name, reg_code, created_at, capital, members)
 
 @app.post("/person")
 def post_person(person_data: PersonCreate):
