@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, SessionLocal
 import models as models
-from services.company import get_company_data, create_company, get_all_companies
+from services.company import get_company_data, create_company, get_all_companies, add_new_member,update_membership_capital
 from services.person import create_person, get_all_people
 
 app = FastAPI()
@@ -27,6 +27,18 @@ class CompanyCreate(BaseModel):
     createdAt: str
     capital: int
     members: list
+    
+class MembershipCreate(BaseModel):
+    is_person: bool
+    capital: int
+    role: str
+    company_reg_code: str
+    member_person_id: int | None
+    member_company_id: int | None
+    
+class UpdateMembershipCapital(BaseModel):
+    membership_id: int
+    capital: int
     
 class PersonCreate(BaseModel):
     name: str
@@ -50,12 +62,19 @@ def post_company(company_data: CompanyCreate):
     
     return create_company(SessionLocal(), name, reg_code, created_at, capital, members)
 
-@app.post("/person")
-def post_person(person_data: PersonCreate):
-    name = person_data.name
-    personal_code = person_data.personalCode
+@app.post("/company/membership")
+def post_membership(membership_data: MembershipCreate):
+    return add_new_member(SessionLocal(), membership_data)
 
-    return create_person(SessionLocal(), name, personal_code)
+@app.post("/company/membership/capital")
+def post_membership_capital(membership_data: UpdateMembershipCapital ):
+    return update_membership_capital(SessionLocal(), membership_data)
+
+# @app.post("/person")
+# def post_person(person_data: PersonCreate):
+#     name = person_data.name
+#     personal_code = person_data.personalCode
+#     return create_person(SessionLocal(), name, personal_code)
 
 @app.get("/people")
 def get_people():
