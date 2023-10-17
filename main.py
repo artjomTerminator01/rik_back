@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import engine, SessionLocal
 import models as models
 from services.company import get_company_data, create_company, get_all_companies, add_new_member,update_membership_capital
-from services.person import create_person, get_all_people
+from services.person import get_all_people
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
@@ -23,8 +23,8 @@ app.add_middleware(
 
 class CompanyCreate(BaseModel):
     name: str
-    regCode: str
-    createdAt: str
+    reg_code: str
+    created_at: str
     capital: int
     members: list
     
@@ -43,6 +43,7 @@ class UpdateMembershipCapital(BaseModel):
 class PersonCreate(BaseModel):
     name: str
     personalCode: str
+    
 
 @app.get("/company/{reg_code}")
 def get_company(reg_code: str):
@@ -54,13 +55,7 @@ def get_companies():
     
 @app.post("/company")
 def post_company(company_data: CompanyCreate):
-    name = company_data.name
-    reg_code = company_data.regCode
-    created_at = company_data.createdAt
-    capital = company_data.capital
-    members = company_data.members
-    
-    return create_company(SessionLocal(), name, reg_code, created_at, capital, members)
+    return create_company(SessionLocal(), company_data)
 
 @app.post("/company/membership")
 def post_membership(membership_data: MembershipCreate):
@@ -69,12 +64,6 @@ def post_membership(membership_data: MembershipCreate):
 @app.post("/company/membership/capital")
 def post_membership_capital(membership_data: UpdateMembershipCapital ):
     return update_membership_capital(SessionLocal(), membership_data)
-
-# @app.post("/person")
-# def post_person(person_data: PersonCreate):
-#     name = person_data.name
-#     personal_code = person_data.personalCode
-#     return create_person(SessionLocal(), name, personal_code)
 
 @app.get("/people")
 def get_people():

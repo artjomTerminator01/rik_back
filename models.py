@@ -22,7 +22,7 @@ class Membership(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     capital = Column(Integer, default=0, nullable=False)
-    is_person = Column(Boolean, nullable=False)  # Define is_person as a boolean column
+    is_person = Column(Boolean, nullable=False)
     role = Column(String, nullable=False)
     company_reg_code = Column(String(7), ForeignKey("company.reg_code"), nullable=False)
 

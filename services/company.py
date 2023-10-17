@@ -13,24 +13,24 @@ def get_all_companies(db: Session):
 
 def get_company_data(db: Session, reg_code: str):
     company = db.query(models.Company).filter(models.Company.reg_code == reg_code).first()
+    
     if company:
         company.members = get_company_members(db, company.reg_code)
     db.close()
-
     return company
 
-def create_company(db: Session, name: str, reg_code: str, created_at: str, capital: int, members: list):
-    check_existing_company(db, name, reg_code)
-    new_company = models.Company(name=name, reg_code=reg_code, created_at=created_at, capital = capital)
+def create_company(db: Session, company_data: dict):
+    check_existing_company(db, company_data.name, company_data.reg_code)
+    new_company = models.Company(name=company_data.name, reg_code=company_data.reg_code, created_at=company_data.created_at, capital = company_data.capital)
     db.add(new_company)
     
-    for member in members:
+    for member in company_data.members:
         if member['is_person']:
             new_membership = models.Membership(
                 capital=member['capital'],
                 is_person=True,
                 role=member['role'],
-                company_reg_code=reg_code,
+                company_reg_code=company_data.reg_code,
                 member_person_id=member['id']
             )
         else: 
@@ -38,7 +38,7 @@ def create_company(db: Session, name: str, reg_code: str, created_at: str, capit
                 capital=member['capital'],
                 is_person=False,
                 role=member['role'],
-                company_reg_code=reg_code,
+                company_reg_code=company_data.reg_code,
                 member_company_id=member['id']
             )
         db.add(new_membership)
