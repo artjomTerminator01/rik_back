@@ -1,7 +1,6 @@
 import models as models
 from sqlalchemy.orm import Session
-
-from services.exceptions import check_existing_company, check_existing_member
+from services.exceptions import check_existing_company
 
 def get_all_companies(db: Session):
     companies = db.query(models.Company).all()
@@ -68,25 +67,19 @@ def update_membership_capital(db: Session, membership_data: dict ):
     return None
 
 def add_new_member(db: Session, membership_data: dict):
+    new_membership = models.Membership(
+        capital=membership_data.capital,
+        is_person=membership_data.is_person,
+        role=membership_data.role,
+        company_reg_code=membership_data.company_reg_code
+    )
     if membership_data.is_person:
-        new_membership = models.Membership(
-            capital=membership_data.capital,
-            is_person=membership_data.is_person,
-            role=membership_data.role,
-            company_reg_code=membership_data.company_reg_code,
-            member_person_id=membership_data.member_person_id
-        )
-    else: 
-        new_membership = models.Membership(
-            capital=membership_data.capital,
-            is_person=membership_data.is_person,
-            role=membership_data.role,
-            company_reg_code=membership_data.company_reg_code,
-            member_company_id=membership_data.member_company_id
-        )
+        new_membership.member_person_id = membership_data.member_person_id
+    else:
+        new_membership.member_company_id = membership_data.member_company_id
     db.add(new_membership)
     db.commit()
-    update_capital(db,membership_data.company_reg_code, membership_data.capital)
+    update_capital(db, membership_data.company_reg_code, membership_data.capital)
     return new_membership
 
 def get_company_members(db, reg_code):
@@ -94,28 +87,24 @@ def get_company_members(db, reg_code):
     members = []
 
     for membership in memberships:
-        if membership.is_person:
-            person = db.query(models.Person).filter(models.Person.id == membership.member_person_id).first()
-            if person:
-                members.append({
-                    'is_person': True,
-                    'name': person.name,
-                    'personal_code': person.personal_code,
-                    'capital': membership.capital,
-                    'role': membership.role,
-                    'membership_id': membership.id
-                })
+        is_person = membership.is_person
+        if is_person:
+            member = db.query(models.Person).filter(models.Person.id == membership.member_person_id).first()
         else:
-            member_company = db.query(models.Company).filter(models.Company.id == membership.member_company_id).first()
-            if member_company:
-                members.append({
-                    'is_person': False,
-                    'name': member_company.name,
-                    'reg_code': member_company.reg_code,
-                    'capital': membership.capital,
-                    'role': membership.role,
-                    'membership_id': membership.id
-
-                })
+            member = db.query(models.Company).filter(models.Company.id == membership.member_company_id).first()
+        if member:
+            member_info = {
+                'is_person': is_person,
+                'name': member.name,
+                'capital': membership.capital,
+                'role': membership.role,
+                'membership_id': membership.id
+            }
+            if is_person:
+                member_info['personal_code'] = member.personal_code
+            else:
+                member_info['reg_code'] = member.reg_code
+            members.append(member_info)
 
     return members
+
