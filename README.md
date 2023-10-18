@@ -40,8 +40,8 @@ Kopeeri github projekt IDE-s (nt VsCode) teises aknas
 https://github.com/artjomTerminator01/rik_front.git
 
 Terminal:
-1- npm install - https://docs.npmjs.com/cli/v8/commands/npm-install
-2- npm start - https://create-react-app.dev/docs/getting-started/
+- npm install - https://docs.npmjs.com/cli/v8/commands/npm-install
+-  npm start - https://create-react-app.dev/docs/getting-started/
 
 RAKENDUS:
 Andmebaasis on lisatud 3 inimest migratsiooni käigus, rakenduse testimiseks tehke firma valmis vajutades ‘CREATE COMPANY’ navbaris. Pärast firma loomist saate seda näha avalehel ka vajutades firma nimele olete navigeeritud firma vaatele. Selle vaadel on nupp ‘CHANGE MEMBERSHIP’ mis navigeerib lehele kus sate lisada vee osanike või muuta olemasolevate osanike kapitaali.
